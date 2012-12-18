@@ -19,8 +19,14 @@ class SmtpClient{
 		struct sockaddr_in addr;
 		char buf[1024];
 		int r;
+//		SSL_METHOD const *smethod;
+		SSL_CTX *context;
+		SSL *ssl;
 	public:
-		SmtpClient(char const *const HOST, int const PORT = 25){
+		SmtpClient(char const *const HOST, int const PORT = 25)
+//		smethod(TLSv1_client_method())
+		{
+
 			sock = socket(AF_INET, SOCK_STREAM, 0);
 			memset(&addr, 0, sizeof(addr));
 			addr.sin_family = AF_INET;
@@ -31,14 +37,20 @@ class SmtpClient{
 				exit(EXIT_FAILURE);
 			}
 			addr.sin_addr.s_addr = a;
-			if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) != 0){
-				cerr<< "ERROR: "<< errno <<endl;
+			SSL_library_init();
+			context = SSL_CTX_new(TLSv1_client_method());
+			ssl = SSL_new(context);
+			SSL_set_fd(ssl,sock);
+			write(1,"test12\n",7);
+			int v = SSL_connect(ssl);
+			FILE *fp = fopen("log","w");
+			fprintf(fp,"testtest\n");
+			if (v <= 0){
+				cout << "ERROR in SSL_connect()\n";
 				exit(EXIT_FAILURE);
-			} 
+			}
 			else 
-				cout << "Connection established!\n";
-				r = recv(sock, buf, 1024, 0);
-				write(1, buf, r);
+				cout << "Connection is made and secure!\n";
 		}
 
 		
