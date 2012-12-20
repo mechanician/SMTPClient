@@ -28,7 +28,7 @@ char* toBase64(char const * const instr){
 	int slen = strlen(instr);
 	int len = slen % 3;
 	int res = (len > 0) ? 1 : 0;
-	char *outstr = (char*)malloc(((slen - len)*4)/3 + 4*res); 	// sizeof(char) = 1 byte -- always! (by defenition)
+	char *outstr = (char*)malloc(((slen - len)*4)/3 + 4*res + 1); 	// sizeof(char) = 1 byte -- always! (by defenition)
 	while (i < slen - len){
 		for(j = 0; j < 3; j++){
 			in[j] = instr[i++];
@@ -36,12 +36,17 @@ char* toBase64(char const * const instr){
 		encodeblock(in, out, 3);
 		for(j = 0; j < 4; j++)
 			outstr[k++] = out[j];
+//		cout << out << endl;
 	}
+
 	for(j = 0; j < len; j++)
 		in[j] = instr[i++];
 	encodeblock(in, out, len);
-	for(j = 0; j < 3; j++)
+//	cout << "!!! " << len << "___ "<< in <<"  -->  " << out << endl;
+	for(j = 0; j < 4; j++)
 		outstr[k++] = out[j];
+	outstr[k] = '\0';
+//	cout << "!!! " << outstr << endl;
 
 	return outstr;
 }
