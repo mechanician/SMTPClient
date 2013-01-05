@@ -36,9 +36,12 @@ int SmtpClient::auth(char *mail_address, char *password) {
 	login = strcat(login,"\r\n");
 	pass = strcat(pass,"\r\n");
 
-	sendRequest("HELO\r\n");
-	if (readResponse(buf) != 250)
+	sendRequest("HELO 127.0.0.1\r\n");
+	if ((status = readResponse(buf)) != 250){
+		cerr << "Error! Received code: " << status << endl;
+		cerr << "Details can be found in logs\n";
 		exit(EXIT_FAILURE);
+	}
 
 	sendRequest("AUTH LOGIN\r\n");
 	readResponse(buf);
